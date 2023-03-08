@@ -6,12 +6,12 @@ import java.awt.event.ActionListener;
 public class RockPaperScissorsGUI extends JFrame {
     private JPanel panel;
     private JLabel userLabel, computerLabel, resultLabel, leaderboardLabel, nameLabel, nameField;
-    private JButton rockButton, paperButton, scissorsButton;
+    private JButton rockButton, paperButton, scissorsButton, restartButton;
     private int userScore = 0, computerScore = 0, round = 0;
     private static Leaderboard leaderboard = new Leaderboard();
 
     public RockPaperScissorsGUI() {
-        panel = new JPanel(new GridLayout(5, 3));
+        panel = new JPanel(new GridLayout(6, 3));
         userLabel = new JLabel("Your choice:");
         userLabel.setForeground(Color.BLUE);
         computerLabel = new JLabel("Computer's choice:");
@@ -60,21 +60,30 @@ public class RockPaperScissorsGUI extends JFrame {
             }
         });
 
+        restartButton = new JButton("Restart");
+        restartButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                restart();
+            }
+        });
+
         panel.add(userLabel);
         panel.add(computerLabel);
         panel.add(rockButton);
         panel.add(paperButton);
         panel.add(scissorsButton);
         panel.add(resultLabel);
-        panel.add(leaderboardLabel);
         panel.add(nameLabel);
         panel.add(nameField);
         panel.add(submitButton);
+        panel.add(leaderboardLabel);
+        panel.add(restartButton);
 
         add(panel);
 
         setTitle("Rock Paper Scissors");
-        setSize(600, 400);
+        setSize(600, 500);
+        getContentPane().setBackground(Color.BLUE);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
@@ -137,7 +146,17 @@ public class RockPaperScissorsGUI extends JFrame {
         } else {
             message = "The game ended in a tie!";
         }
-        JOptionPane.showMessageDialog(null, message);
+        JOptionPane.showMessageDialog(null,
+                message + " Submit your name to be added to the Leader Board. Press restart to play again.");
     }
 
+    public void restart() {
+        computerScore = 0;
+        userLabel.setText("Player: 0");
+        computerLabel.setText("Computer: 0");
+        resultLabel.setText("");
+        computerLabel.setText("");
+        return;
+
+    }
 }

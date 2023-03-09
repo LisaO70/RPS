@@ -17,13 +17,13 @@ public class RockPaperScissorsGUI extends JFrame {
         computerLabel = new JLabel("Computer's choice:");
         computerLabel.setForeground(Color.BLUE);
         resultLabel = new JLabel("Round " + (round + 1) + ": Choose your weapon!");
-        resultLabel.setForeground(Color.GREEN);
+        resultLabel.setForeground(Color.RED);
         leaderboardLabel = new JLabel("Leaderboard: ");
         leaderboardLabel.setForeground(Color.RED);
         nameLabel = new JLabel("Enter your name:");
         nameLabel.setForeground(Color.BLACK);
 
-        JTextField nameField = new JTextField("Name");
+        JTextField nameField = new JTextField(" ");
         nameField.setForeground(Color.BLACK);
 
         JButton submitButton = new JButton("Submit");
@@ -31,13 +31,13 @@ public class RockPaperScissorsGUI extends JFrame {
         submitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String playerName = nameField.getText();
-                leaderboard.addPlayer(new Player(playerName, 0));
-                leaderboardLabel.setText(playerName);
+                leaderboard.addPlayer(new Player(playerName, userScore));
+                leaderboardLabel.setText("Leaderboard: " + " Name: " + playerName + " Highest Score: " + userScore);
             }
         });
 
         rockButton = new JButton("Rock");
-        rockButton.setBackground(Color.PINK);
+        rockButton.setBackground(Color.GRAY);
         rockButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 playRound("Rock");
@@ -45,7 +45,7 @@ public class RockPaperScissorsGUI extends JFrame {
         });
 
         paperButton = new JButton("Paper");
-        paperButton.setBackground(Color.PINK);
+        paperButton.setBackground(Color.GRAY);
         paperButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 playRound("Paper");
@@ -53,7 +53,7 @@ public class RockPaperScissorsGUI extends JFrame {
         });
 
         scissorsButton = new JButton("Scissors");
-        scissorsButton.setBackground(Color.PINK);
+        scissorsButton.setBackground(Color.GRAY);
         scissorsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 playRound("Scissors");
@@ -96,7 +96,7 @@ public class RockPaperScissorsGUI extends JFrame {
         userLabel.setText("Your choice: " + userChoice);
         computerLabel.setText("Computer's choice: " + computerChoice);
         resultLabel.setText(result);
-        leaderboardLabel.setText("Leaderboard: " + nameField);
+        leaderboardLabel.setText("Leaderboard: " + nameField + userScore);
 
         round++;
         if (round == 3) {

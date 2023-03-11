@@ -1,18 +1,27 @@
-public class Player {
+class Player {
 
     private String name;
     private int score;
+    private String dob;
 
-    public Player(String name, int score) {
+    Player(String name, String dob) {
         this.name = name;
-        this.score = score;
+        this.dob = dob;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public int getScore() {
+    String getDob() {
+        return dob;
+    }
+
+    int getScore() {
         return score;
+    }
+
+    void setScore(int score) {
+        this.score = score;
     }
 }

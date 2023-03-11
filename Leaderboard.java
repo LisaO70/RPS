@@ -11,11 +11,6 @@ public class Leaderboard {
 
     public void addPlayer(Player player) {
         players.add(player);
-        sortPlayersByScore();
-    }
-
-    public void removePlayer(Player player) {
-        players.remove(player);
     }
 
     public List<Player> getTopPlayers(int count) {
@@ -25,9 +20,4 @@ public class Leaderboard {
     public List<Player> getAllPlayers() {
         return players;
     }
-
-    private void sortPlayersByScore() {
-        players.sort((p1, p2) -> Integer.compare(p2.getScore(), p1.getScore()));
-    }
-
 }

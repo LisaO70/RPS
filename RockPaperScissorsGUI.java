@@ -4,89 +4,162 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class RockPaperScissorsGUI extends JFrame {
-    private JPanel panel;
-    private JLabel userLabel, computerLabel, resultLabel, leaderboardLabel, nameLabel, nameField;
-    private JButton rockButton, paperButton, scissorsButton, restartButton;
+    private JPanel panelMenu;
+    private JPanel panelGame;
+    private JLabel userLabel, computerLabel, resultLabel;
+    private JTextField dobField, nameField;
     private int userScore = 0, computerScore = 0, round = 0;
-    private static Leaderboard leaderboard = new Leaderboard();
+    private Leaderboard leaderboard = new Leaderboard();
+    private Player currentPlayer;
 
     public RockPaperScissorsGUI() {
-        panel = new JPanel(new GridLayout(6, 3));
-        userLabel = new JLabel("Your choice:");
-        userLabel.setForeground(Color.BLUE);
-        computerLabel = new JLabel("Computer's choice:");
-        computerLabel.setForeground(Color.BLUE);
-        resultLabel = new JLabel("Round " + (round + 1) + ": Choose your weapon!");
-        resultLabel.setForeground(Color.RED);
-        leaderboardLabel = new JLabel("Leaderboard: ");
-        leaderboardLabel.setForeground(Color.RED);
-        nameLabel = new JLabel("Enter your name:");
-        nameLabel.setForeground(Color.BLACK);
+        super("Rock Paper Scissors");
 
-        JTextField nameField = new JTextField(" ");
-        nameField.setForeground(Color.BLACK);
+        createMenuGUI();
 
-        JButton submitButton = new JButton("Submit");
-        submitButton.setForeground(Color.GREEN);
-        submitButton.addActionListener(new ActionListener() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+    }
+
+    private void createMenuGUI() {
+        panelMenu = new JPanel();
+
+        JLabel nameLabel = new JLabel("Name:");
+        nameField = new JTextField(20);
+        JPanel namePanel = new JPanel();
+        namePanel.add(nameLabel);
+        namePanel.add(nameField);
+
+        // date of birth
+        JLabel dobLabel = new JLabel("Date of Birth:");
+        dobField = new JTextField(10);
+        JPanel dobPanel = new JPanel();
+        dobPanel.add(dobLabel);
+        dobPanel.add(dobField);
+
+        // leaderboard
+        var topPlayers = leaderboard.getTopPlayers(10);
+
+        String[] leaderboardData = new String[topPlayers.size()];
+        for (int i = 0; i < topPlayers.size(); i++) {
+            leaderboardData[i] = topPlayers.get(i).getName() + " / " + topPlayers.get(i).getDob() + " / "
+                    + topPlayers.get(i).getScore();
+        }
+
+        JLabel leaderboardLabel = new JLabel("Leaderboard - Name, DoB & Highest Score:");
+        JList<String> leaderboardList = new JList<>(leaderboardData);
+        JScrollPane scrollPane = new JScrollPane(leaderboardList);
+        scrollPane.setPreferredSize(new Dimension(200, 100));
+        JPanel leaderboardPanel = new JPanel();
+        leaderboardPanel.add(leaderboardLabel);
+        leaderboardPanel.add(scrollPane);
+
+        // start button
+        JPanel buttonPanel = new JPanel();
+        JButton startButton = new JButton("Start Game");
+        startButton.setForeground(Color.GREEN);
+        startButton.setPreferredSize(new Dimension(100, 100));
+        startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String playerName = nameField.getText();
-                leaderboard.addPlayer(new Player(playerName, userScore));
-                leaderboardLabel.setText("Leaderboard: " + " Name: " + playerName + " Highest Score: " + userScore);
+                checkDetails();
             }
         });
+        buttonPanel.add(startButton);
 
-        rockButton = new JButton("Rock");
-        rockButton.setBackground(Color.GRAY);
+        panelMenu.setLayout(new GridLayout(3, 1));
+        panelMenu.add(namePanel);
+        panelMenu.add(dobPanel);
+        panelMenu.add(leaderboardPanel);
+        panelMenu.add(buttonPanel);
+
+        getContentPane().removeAll();
+        getContentPane().add(panelMenu);
+        pack();
+        setVisible(true);
+    }
+
+    // creating the game GUI
+    private void createGameGUI(Player currentPlayer) {
+        panelGame = new JPanel();
+        userScore = 0;
+        computerScore = 0;
+        round = 0;
+
+        // user label
+        userLabel = new JLabel(currentPlayer.getName() + ": 0 vs Computer: 0");
+        userLabel.setForeground(Color.BLUE);
+        JPanel scorePanel = new JPanel();
+        scorePanel.add(userLabel);
+
+        // creating the game buttons
+
+        JPanel buttonPanelrps = new JPanel();
+        buttonPanelrps.setLayout(new FlowLayout(FlowLayout.CENTER, 60, 30));
+        getContentPane().setBackground(Color.BLUE);
+
+        JButton rockButton = new JButton("Rock");
+        rockButton.setPreferredSize(new Dimension(200, 100));
         rockButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 playRound("Rock");
             }
         });
 
-        paperButton = new JButton("Paper");
-        paperButton.setBackground(Color.GRAY);
+        JButton paperButton = new JButton("Paper");
+        paperButton.setPreferredSize(new Dimension(200, 100));
         paperButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 playRound("Paper");
             }
         });
-
-        scissorsButton = new JButton("Scissors");
-        scissorsButton.setBackground(Color.GRAY);
+        JButton scissorsButton = new JButton("Scissors");
+        scissorsButton.setPreferredSize(new Dimension(200, 100));
         scissorsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 playRound("Scissors");
             }
         });
 
-        restartButton = new JButton("Restart");
-        restartButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                restart();
-            }
-        });
+        // Adding game buttons
+        buttonPanelrps.add(rockButton);
+        buttonPanelrps.add(paperButton);
+        buttonPanelrps.add(scissorsButton);
 
-        panel.add(userLabel);
-        panel.add(computerLabel);
-        panel.add(rockButton);
-        panel.add(paperButton);
-        panel.add(scissorsButton);
-        panel.add(resultLabel);
-        panel.add(nameLabel);
-        panel.add(nameField);
-        panel.add(submitButton);
-        panel.add(leaderboardLabel);
-        panel.add(restartButton);
+        // Computer choice label
+        JPanel computerPanel = new JPanel();
+        computerLabel = new JLabel("Computer's choice: ");
+        computerLabel.setForeground(Color.BLUE);
+        computerPanel.add(computerLabel);
 
-        add(panel);
+        // Result label
+        JPanel resultPanel = new JPanel();
+        resultLabel = new JLabel("Enjoy the game!");
+        resultLabel.setForeground(Color.RED);
+        resultPanel.add(resultLabel);
 
-        setTitle("Rock Paper Scissors");
-        setSize(600, 500);
-        getContentPane().setBackground(Color.BLUE);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        panelGame.setLayout(new BoxLayout(panelGame, BoxLayout.Y_AXIS));
+        panelGame.add(scorePanel);
+        panelGame.add(buttonPanelrps);
+        panelGame.add(computerPanel);
+        panelGame.add(resultPanel);
+
+        getContentPane().removeAll();
+        getContentPane().add(panelGame);
+        pack();
         setVisible(true);
+    }
+
+    private void checkDetails() {
+        String name = nameField.getText();
+        String dob = dobField.getText();
+        if (name.isEmpty() || dob.isEmpty()) {
+            JLabel label = new JLabel("Please enter your name and date of birth!");
+            label.setForeground(Color.RED);
+            JOptionPane.showMessageDialog(this, label, "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            currentPlayer = new Player(name, dob);
+            createGameGUI(currentPlayer);
+        }
     }
 
     private void playRound(String userChoice) {
@@ -96,7 +169,6 @@ public class RockPaperScissorsGUI extends JFrame {
         userLabel.setText("Your choice: " + userChoice);
         computerLabel.setText("Computer's choice: " + computerChoice);
         resultLabel.setText(result);
-        leaderboardLabel.setText("Leaderboard: " + nameField + userScore);
 
         round++;
         if (round == 3) {
@@ -138,25 +210,17 @@ public class RockPaperScissorsGUI extends JFrame {
     }
 
     private void endGame() {
+        currentPlayer.setScore(userScore);
+        leaderboard.addPlayer(currentPlayer);
+        createMenuGUI();
         String message = "";
         if (userScore > computerScore) {
-            message = "You won the game!";
+            message = currentPlayer.getName() + " won the game!";
         } else if (computerScore > userScore) {
-            message = "You lost the game!";
+            message = currentPlayer.getName() + " lost the game!";
         } else {
             message = "The game ended in a tie!";
         }
-        JOptionPane.showMessageDialog(null,
-                message + " Submit your name to be added to the Leader Board. Press restart to play again.");
-    }
-
-    public void restart() {
-        computerScore = 0;
-        userLabel.setText("Player: 0");
-        computerLabel.setText("Computer: 0");
-        resultLabel.setText("");
-        computerLabel.setText("");
-        return;
-
+        JOptionPane.showMessageDialog(null, "The computer chose " + getComputerChoice() + " " + message);
     }
 }
